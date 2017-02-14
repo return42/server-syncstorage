@@ -1,11 +1,14 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# pylint: disable=W1505, C0103
 
 import unittest2
 import time
 
 try:
+    # pylint: disable=W0611
     from syncstorage.storage.memcached import MemcachedStorage  # NOQA
     from syncstorage.storage.memcached import SIZE_RECALCULATION_PERIOD
     MEMCACHED = True

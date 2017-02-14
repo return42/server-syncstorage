@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# pylint: disable=C0103
 
 import json
 
@@ -22,7 +24,7 @@ WEAVE_OVER_QUOTA = 14               # User over quota
 WEAVE_SIZE_LIMIT_EXCEEDED = 17      # Size limit exceeded
 
 
-def set_x_timestamp_header(handler, registry):
+def set_x_timestamp_header(handler, registry): # pylint: disable=W0613
     """Tween to set the X-Weave-Timestamp header on all responses."""
 
     def set_x_timestamp_header_tween(request):
@@ -37,7 +39,7 @@ def set_x_timestamp_header(handler, registry):
     return set_x_timestamp_header_tween
 
 
-def set_default_accept_header(handler, registry):
+def set_default_accept_header(handler, registry):  # pylint: disable=W0613
     """Tween to set a default Accept header on incoming requests.
 
     This tween intercepts requests without an Accept header, adding one
@@ -55,7 +57,7 @@ def set_default_accept_header(handler, registry):
     return set_default_accept_header_tween
 
 
-def convert_cornice_errors_to_respcodes(handler, registry):
+def convert_cornice_errors_to_respcodes(handler, registry):   # pylint: disable=W0613
     """Tween to convert cornice error objects into integer response codes.
 
     This is an uglifying pass that inspects cornice error information and
@@ -80,7 +82,7 @@ def convert_cornice_errors_to_respcodes(handler, registry):
             pass
         return None
 
-    def convert_cornice_response(request, response):
+    def convert_cornice_response(request, response):  # pylint: disable=W0613
         try:
             body = json.loads(response.body)
         except ValueError:
@@ -110,7 +112,7 @@ def convert_cornice_errors_to_respcodes(handler, registry):
     return convert_cornice_errors_to_respcodes_tween
 
 
-def convert_non_json_responses(handler, registry):
+def convert_non_json_responses(handler, registry):  # pylint: disable=W0613
     """Tween to convert non-json response bodies to json.
 
     The framework can sometimes generate a HTML response page, e.g. for a

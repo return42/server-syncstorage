@@ -98,7 +98,7 @@ class MemcachedClient(MemcachedClient):
             raise ValueError("value too long")
         return value, 0
 
-    def _decode_value(self, value, flags):
+    def _decode_value(self, value, flags):  # pylint: disable=W0613
         return json_loads(value)
 
 
@@ -122,10 +122,12 @@ class MemcachedStorage(SyncStorage):
 
     """
 
-    def __init__(self, storage, cache_servers=None, cache_key_prefix="",
-                 cache_pool_size=None, cache_pool_timeout=60,
-                 cached_collections=(), cache_only_collections=(),
-                 cache_lock=False, cache_lock_ttl=None, **kwds):
+    def __init__(  # pylint: disable=W0613
+            self, storage, cache_servers=None, cache_key_prefix="",
+            cache_pool_size=None, cache_pool_timeout=60,
+            cached_collections=(), cache_only_collections=(),
+            cache_lock=False, cache_lock_ttl=None, **kwds):
+
         self.storage = storage
         self.cache = MemcachedClient(cache_servers, cache_key_prefix,
                                      cache_pool_size, cache_pool_timeout)
@@ -555,7 +557,7 @@ class MemcachedStorage(SyncStorage):
         # We also use this function internally to recover from errors.
         update_was_called = []
 
-        def update(ts=ts, col_ts=col_ts, size_incr=0):
+        def update(ts=ts, col_ts=col_ts, size_incr=0):  # pylint: disable=C0103
             assert not update_was_called
             update_was_called.append(True)
             data["modified"] = ts
@@ -948,7 +950,7 @@ class CacheOnlyManager(_CachedManagerBase):
             raise ItemNotFoundError
         return modified
 
-    def get_cached_batches(self, userid, ts=None):
+    def get_cached_batches(self, userid, ts=None):  # pylint: disable=C0103
         if ts is None:
             ts = get_timestamp()
         ts = int(ts)
@@ -1039,7 +1041,7 @@ class CachedManager(_CachedManagerBase):
     underlying store.
     """
 
-    def get_cached_data(self, userid, refresh_if_missing=True):
+    def get_cached_data(self, userid, refresh_if_missing=True):  # pylint: disable=W0221
         """Get the cached collection data, pulling into cache if missing.
 
         This method returns the cached collection data, populating it from

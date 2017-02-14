@@ -30,7 +30,7 @@ from syncstorage.views.decorators import (convert_storage_errors,
 from syncstorage.views.util import get_resource_timestamp, get_limit_config
 
 
-logger = logging.getLogger("syncstorage")
+logger = logging.getLogger("syncstorage")  # pylint: disable=C0103
 
 DEFAULT_VALIDATORS = (
     extract_target_resource,
@@ -118,7 +118,7 @@ site_root = Service(name="site_root", path="/")
 
 
 @site_root.get()
-def get_site_root(request):
+def get_site_root(request):  # pylint: disable=W0613
     return "It Works!  SyncStorage is successfully running on this host."
 
 

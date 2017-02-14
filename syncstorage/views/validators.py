@@ -12,7 +12,7 @@ from syncstorage.storage import get_storage
 from syncstorage.views.util import json_error, get_limit_config
 
 import logging
-logger = logging.getLogger("syncstorage.views.validators")
+logger = logging.getLogger("syncstorage.views.validators")  # pylint: disable=C0103
 
 
 BATCH_MAX_IDS = 100

@@ -22,7 +22,7 @@ class SyncStorageRenderer(object):
             self.adjust_response(value, request, response)
         return self.render_value(value)
 
-    def adjust_response(self, value, request, response):
+    def adjust_response(self, value, request, response):  # pylint: disable=W0613
         # Ensure that every response reports the last-modified timestamp.
         # In most cases this will have already been set when we looked it
         # up during processing of the request.

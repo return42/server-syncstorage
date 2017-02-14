@@ -39,7 +39,7 @@ from syncstorage.storage.sql.dbconnect import (DBConnector, MAX_TTL,
 from mozsvc.metrics import metrics_timer
 
 
-logger = logging.getLogger("syncstorage.storage.sql")
+logger = logging.getLogger("syncstorage.storage.sql")  # pylint: disable=C0103
 
 # For efficiency, it's possible to use fixed pre-determined IDs for
 # common collection names.  This is the canonical list of such names.
@@ -668,7 +668,7 @@ class SQLStorage(SyncStorage):
                 row["ttl"] = data["ttl"] + int(session.timestamp)
         return row
 
-    def _prepare_bui_row(self, session, batchid, item, data):
+    def _prepare_bui_row(self, session, batchid, item, data):  # pylint: disable=W0613
         row = {}
         row["batch"] = batchid
         row["id"] = item

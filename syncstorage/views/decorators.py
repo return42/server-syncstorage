@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# pylint: disable=C0103
 
 import time
 import logging
@@ -20,7 +22,7 @@ from syncstorage.views.util import (make_decorator,
                                     json_error,
                                     get_resource_timestamp)
 
-logger = logging.getLogger("syncstorage")
+logger = logging.getLogger("syncstorage")  # pylint: disable=C0103
 
 ONE_KB = 1024
 ONE_MB = 1024 * 1024

@@ -13,7 +13,7 @@ from pyramid.interfaces import IAuthenticationPolicy
 from mozsvc.user import TokenServerAuthenticationPolicy
 
 
-logger = logging.getLogger("syncstorage")
+logger = logging.getLogger("syncstorage")  # pylint: disable=C0103
 
 
 DEFAULT_EXPIRED_TOKEN_TIMEOUT = 60 * 60 * 2  # 2 hours, in seconds
