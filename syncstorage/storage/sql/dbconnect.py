@@ -1,6 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
+
 """
 Low-level SQL backend for syncstorage.
 
@@ -22,7 +23,6 @@ import re
 import sys
 import copy
 import logging
-import urlparse
 import traceback
 import functools
 from collections import defaultdict
@@ -45,6 +45,8 @@ from syncstorage.storage.sql import (queries_generic,
                                      queries_postgres,
                                      queries_mysql)
 
+import six
+from six.moves import urllib
 
 logger = logging.getLogger("syncstorage.storage.sql")  # pylint: disable=C0103
 
@@ -300,7 +302,7 @@ class DBConnector(object):
                  pool_max_overflow=10, pool_max_backlog=-1, pool_timeout=30,
                  shard=False, shardsize=100, **kwds):
 
-        parsed_sqluri = urlparse.urlparse(sqluri)
+        parsed_sqluri = urllib.parse.urlparse(sqluri)
         self.sqluri = sqluri
         self.driver = parsed_sqluri.scheme.lower()
         if "mysql" in self.driver:
@@ -349,7 +351,7 @@ class DBConnector(object):
         # Create the engine.
         # We set the umask during this call, to ensure that any sqlite
         # databases will be created with secure permissions by default.
-        old_umask = os.umask(0077)
+        old_umask = os.umask(0o77)
         try:
             self.engine = create_engine(sqluri, **sqlkw)
         finally:
@@ -430,7 +432,7 @@ class DBConnector(object):
         # If it's a string, do some interpolation and return it.
         # XXX TODO: we could pre-parse these queries at load time to look for
         # string interpolation variables, saving some time on each call.
-        assert isinstance(query, basestring)
+        assert isinstance(query, six.string_types)
         qvars = {}
         if "%(bso)s" in query:
             if "bso" in params:
@@ -528,7 +530,7 @@ def report_backend_errors(func):
     def report_backend_errors_wrapper(self, *args, **kwds):
         try:
             return func(self, *args, **kwds)
-        except Exception, exc:
+        except Exception as exc:
             if not is_operational_db_error(self._connector.engine, exc):
                 raise
             # An unexpected database-level error.
@@ -624,7 +626,7 @@ class DBConnection(object):
             try:
                 query_str = self._render_query(query, params, annotations)
                 return self._exec_with_cleanup(connection, query_str, **params)
-            except DBAPIError, exc:
+            except DBAPIError as exc:
                 if not is_retryable_db_error(self._connector.engine, exc):
                     raise
                 if session_was_active:
@@ -713,12 +715,12 @@ class DBConnection(object):
         job is to add annotations in a comment on the query.
         """
         # Convert SQLAlchemy expression objects into a string.
-        if isinstance(query, basestring):
+        if isinstance(query, six.string_types):
             query_str = query
         else:
             dialect = self._connector._render_query_dialect
             compiled = query.compile(dialect=dialect)
-            for param, value in compiled.params.iteritems():
+            for param, value in compiled.params.items():
                 params.setdefault(param, value)
             query_str = str(compiled)
         # Join all the annotations into a comment string.

@@ -181,7 +181,7 @@ def get_info_quota(request):
 def get_info_usage(request):
     storage = request.validated["storage"]
     sizes = storage.get_collection_sizes(request.validated["userid"])
-    for collection, size in sizes.iteritems():
+    for collection, size in sizes.items():
         sizes[collection] = size / ONE_KB
     request.response.headers["X-Weave-Records"] = str(len(sizes))
     return sizes
@@ -337,7 +337,7 @@ def post_collection(request):
 
     # If some BSOs failed to parse properly, include them
     # in the failure list straight away.
-    for (id, error) in invalid_bsos.iteritems():
+    for (id, error) in invalid_bsos.items():
         res["failed"][id] = error
 
     ts = storage.set_items(userid, collection, bsos)
@@ -368,18 +368,18 @@ def post_collection_batch(request):
     # The two flags are mutually exclusive.
     res = {'success': [], 'failed': {}}
 
-    for (id, error) in invalid_bsos.iteritems():
+    for (id, error) in invalid_bsos.items():
         res["failed"][id] = error
 
     try:
         if batch is True:
             try:
                 batch = storage.create_batch(userid, collection)
-            except ConflictError, e:
+            except ConflictError as e:
                 logger.error('Collision in batch creation!')
                 logger.error(e)
                 raise
-            except Exception, e:
+            except Exception as e:
                 logger.error('Could not create batch')
                 logger.error(e)
                 raise
@@ -393,7 +393,7 @@ def post_collection_batch(request):
                 storage.append_items_to_batch(userid, collection, batch, bsos)
             except ConflictError:
                 raise
-            except Exception, e:
+            except Exception as e:
                 logger.error('Could not append to batch("{0}")'.format(batch))
                 logger.error(e)
                 for bso in bsos:
@@ -404,11 +404,11 @@ def post_collection_batch(request):
         if commit:
             try:
                 ts = storage.apply_batch(userid, collection, batch)
-            except ConflictError, e:
+            except ConflictError as e:
                 logger.error('Collision in batch commit!')
                 logger.error(e)
                 raise
-            except Exception, e:
+            except Exception as e:
                 logger.error("Could not apply batch")
                 logger.error(e)
                 raise

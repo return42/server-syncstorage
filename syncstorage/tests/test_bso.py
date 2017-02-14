@@ -4,12 +4,12 @@
 #
 # pylint: disable=C0103
 
-import unittest2
+import unittest
 
 from syncstorage.bso import BSO
 
 
-class TestBSO(unittest2.TestCase):
+class TestBSO(unittest.TestCase):
 
     def test_test_nonscalar_values_are_rejected(self):
         self.assertRaises(ValueError,

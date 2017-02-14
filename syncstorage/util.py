@@ -18,7 +18,7 @@ def get_timestamp(value=None):
         if not isinstance(value, decimal.Decimal):
             value = decimal.Decimal(str(value))
         return value.quantize(TWO_DECIMAL_PLACES)
-    except decimal.InvalidOperation, e:
+    except decimal.InvalidOperation as e:
         raise ValueError(str(e))
 
 

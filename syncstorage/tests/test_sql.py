@@ -19,6 +19,8 @@ from syncstorage.tests.test_storage import StorageTestsMixin
 
 from mozsvc.exceptions import BackendError
 
+from six.moves import range
+
 _UID = 1
 _PLD = '*' * 500
 
@@ -113,7 +115,7 @@ class TestSQLStorage(StorageTestCase, StorageTestsMixin):
         def take_connection():
             try:
                 connections.append(engine.connect())
-            except Exception, e:
+            except Exception as e:
                 errors.append(e)
 
         # The size of the pool is two, so we can take
@@ -170,12 +172,12 @@ class TestSQLStorage(StorageTestCase, StorageTestsMixin):
         # Add 2000 items with short ttl to the db.
         # This forces the purge script to run several iterations.
         items = [{"id": "SHORT" + str(i), "payload": str(i), "ttl": 0}
-                 for i in xrange(2000)]
+                 for i in range(2000)]
         self.storage.set_items(_UID, "col", items)
 
         # Add 5 items with long ttl to the db.
         items = [{"id": "LONG" + str(i), "payload": str(i), "ttl": 10}
-                 for i in xrange(5)]
+                 for i in range(5)]
         self.storage.set_items(_UID, "col", items)
 
         # Wait for ttls to expire.

@@ -7,8 +7,10 @@
 import os
 import sys
 import time
-import unittest2
+import unittest
 import subprocess
+
+from six.moves import range
 
 from mozsvc.exceptions import BackendError
 
@@ -18,6 +20,7 @@ from syncstorage.storage import (load_storage_from_settings,
                                  BATCH_LIFETIME)
 
 try:
+    # pylint: disable=W0611
     from syncstorage.storage.memcached import MemcachedStorage  # NOQA
     MEMCACHED = True
 except ImportError:
@@ -38,7 +41,7 @@ class TestMemcacheManagementScripts(StorageTestCase):
     def setUp(self):
         super(TestMemcacheManagementScripts, self).setUp()
         if not MEMCACHED:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         settings = self.config.registry.settings
         self.storage = load_storage_from_settings("storage", settings)
@@ -48,7 +51,7 @@ class TestMemcacheManagementScripts(StorageTestCase):
             self.storage.cache.set('test', 1)
             assert self.storage.cache.get('test') == 1
         except BackendError:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
     def test_mcclear_script(self):
         # Create some data in cached collections, for three different users.
@@ -117,7 +120,7 @@ class TestPurgeTTLScript(StorageTestCase):
 
         def count_items(query):
             total_items = 0
-            for i in xrange(storage.dbconnector.shardsize):
+            for i in range(storage.dbconnector.shardsize):
                 with storage.dbconnector.connect() as c:
                     res = c.execute(query % {
                         "bso": "bso" + str(i),

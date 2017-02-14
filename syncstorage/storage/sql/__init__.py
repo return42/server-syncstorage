@@ -1,6 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
+
 """
 SQL backend for syncstorage.
 
@@ -38,6 +39,7 @@ from syncstorage.storage.sql.dbconnect import (DBConnector, MAX_TTL,
 
 from mozsvc.metrics import metrics_timer
 
+from six.moves import range
 
 logger = logging.getLogger("syncstorage.storage.sql")  # pylint: disable=C0103
 
@@ -73,7 +75,7 @@ def convert_db_errors(func):
     def convert_db_errors_wrapper(*args, **kwds):
         try:
             return func(*args, **kwds)
-        except BackendError, e:
+        except BackendError as e:
             # There is no standard exception to detect lock-wait timeouts,
             # so we report any operational db error that has "lock" in it.
             if "lock" in str(e).lower():
@@ -140,7 +142,7 @@ class SQLStorage(SyncStorage):
         self._collections_by_name = {}
         self._collections_by_id = {}
         if self.standard_collections:
-            for id, name in STANDARD_COLLECTIONS.iteritems():
+            for id, name in STANDARD_COLLECTIONS.items():
                 self._collections_by_name[name] = id
                 self._collections_by_id[id] = name
 
@@ -731,7 +733,7 @@ class SQLStorage(SyncStorage):
             tables = set(("bso",))
         else:
             tables = set(self.dbconnector.get_bso_table(i).name
-                         for i in xrange(self.dbconnector.shardsize))
+                         for i in range(self.dbconnector.shardsize))
             assert len(tables) == self.dbconnector.shardsize
         # Purge each table in turn, summing rowcounts.
         num_purged = 0
@@ -763,7 +765,7 @@ class SQLStorage(SyncStorage):
             tables = set(("batch_upload_items",))
         else:
             tables = set(self.dbconnector.get_batch_item_table(i).name
-                         for i in xrange(self.dbconnector.shardsize))
+                         for i in range(self.dbconnector.shardsize))
             assert len(tables) == self.dbconnector.shardsize
         # Purge each table in turn, summing rowcounts.
         num_purged = 0

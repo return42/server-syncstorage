@@ -7,6 +7,7 @@
 import re
 import json
 import decimal
+import six
 
 FIELDS = set(('id', 'collection', 'sortindex', 'modified',
               'payload', 'payload_size', 'ttl'))
@@ -23,13 +24,14 @@ MAX_SORTINDEX_VALUE = 999999999
 MIN_SORTINDEX_VALUE = -999999999
 VALID_ID_REGEX = re.compile("^[ -~]{1,64}$")  # <=64 printable characters
 
-SCALAR_TYPES = (int, long, basestring, decimal.Decimal)
+SCALAR_TYPES = six.integer_types + six.string_types + (decimal.Decimal, )
 
 
 class BSO(dict):
     """Holds BSO info"""
 
     def __init__(self, data=None, converters=None):
+        super(BSO, self).__init__()
         if data is None:
             data = {}
         if converters is None:
@@ -54,11 +56,12 @@ class BSO(dict):
             self[name] = value
 
     def __str__(self):
-        fields = dict((k, v) for (k, v) in self.iteritems() if k != 'payload')
+        fields = dict((k, v) for (k, v) in self.items() if k != 'payload')
         return "BSO(%s)" % (json.dumps(fields, sort_keys=True),)
 
     def validate(self):
         """Validates the values the BSO has."""
+        # pylint: disable=R0911,R0912
         # Check that there are no extraneous fields.
         for name in self:
             if name not in FIELDS:
@@ -118,7 +121,7 @@ class BSO(dict):
         # Check that the payload is a string, and is not too big.
         payload = self.get('payload')
         if payload is not None:
-            if not isinstance(payload, basestring):
+            if not isinstance(payload, six.string_types):
                 return False, 'payload not a string'
             self['payload_size'] = len(payload.encode("utf8"))
             if self['payload_size'] > MAX_PAYLOAD_SIZE:

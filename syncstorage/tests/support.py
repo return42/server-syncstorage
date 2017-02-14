@@ -4,7 +4,6 @@
 
 import os
 import uuid
-import urlparse
 import functools
 
 import sqlalchemy.event
@@ -12,6 +11,7 @@ from sqlalchemy.engine.base import Engine
 
 from mozsvc.tests.support import TestCase
 
+from six.moves import urllib
 
 def restore_env(*keys):
     """Decorator that ensures os.environ gets restored after a test.
@@ -40,7 +40,7 @@ def restore_env(*keys):
 # Unfortunately SQLAlchemy doesn't have a way to unregister a listener,
 # so once you import this module the listener will be installed forever.
 @sqlalchemy.event.listens_for(Engine, "before_cursor_execute")
-def validate_database_query(conn, cursor, statement, *args):
+def validate_database_query(conn, cursor, statement, *args):  # pylint: disable=W0613
     """Check that database queries have appripriate metadata."""
     statement = statement.strip()
     if statement.startswith("PRAGMA "):
@@ -97,7 +97,7 @@ class StorageTestCase(TestCase):
     def _cleanup_test_databases(self):
         """Clean up any database used during the tests."""
         # Find and clean up any in-use databases
-        for key, storage in self.config.registry.iteritems():
+        for key, storage in self.config.registry.items():
             if not key.startswith("syncstorage:storage:"):
                 continue
             while hasattr(storage, "storage"):
@@ -113,9 +113,9 @@ class StorageTestCase(TestCase):
             # Explicitly free any pooled connections.
             storage.dbconnector.engine.dispose()
         # Find any sqlite database files and delete them.
-        for key, value in self.config.registry.settings.iteritems():
+        for key, value in self.config.registry.settings.items():
             if key.endswith(".sqluri"):
-                sqluri = urlparse.urlparse(value)
+                sqluri = urllib.parse.urlparse(value)
                 if sqluri.scheme == 'sqlite' and ":memory:" not in value:
                     if os.path.isfile(sqluri.path):
                         os.remove(sqluri.path)

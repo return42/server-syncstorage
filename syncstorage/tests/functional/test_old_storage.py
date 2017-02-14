@@ -25,6 +25,8 @@ from syncstorage.tests.functional.support import StorageFunctionalTestCase
 from syncstorage.tests.functional.support import run_live_functional_tests
 from syncstorage.views.util import get_limit_config
 
+from six.moves import range
+
 WEAVE_INVALID_WBO = 8
 
 
@@ -611,7 +613,7 @@ class TestOldStorage(StorageFunctionalTestCase):
         # from the one reported in X-Weave-Timestamp.
         wbo = {'id': 'TEST', 'payload': 'DATA'}
         res = self.app.put_json(self.root + '/storage/col2/TEST', wbo)
-        for i in xrange(200):
+        for i in range(200):
             wbo = self.app.get(self.root + '/storage/col2/TEST').json
             res = self.app.put_json(self.root + '/storage/col2/TEST', wbo)
             self.assertEquals(float(res.body),

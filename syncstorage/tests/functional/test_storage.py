@@ -17,7 +17,7 @@ consider it a bug.
 
 """
 
-import unittest2
+import unittest
 
 import re
 import sys
@@ -43,6 +43,7 @@ from syncstorage.views.util import get_limit_config
 
 from mozsvc.exceptions import BackendError
 
+from six.moves import range
 
 _PLD = '*' * 500
 _ASCII = string.ascii_letters + string.digits
@@ -77,9 +78,9 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_get_collections(self):
         # col1 gets 3 items, col2 gets 5 items.
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(3)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(3)]
         self.app.post_json(self.root + "/storage/col1", bsos)
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
         # only those collections should appear in the query.
         resp = self.app.get(self.root + '/info/collections')
@@ -89,9 +90,9 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_get_collection_count(self):
         # col1 gets 3 items, col2 gets 5 items.
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(3)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(3)]
         self.app.post_json(self.root + "/storage/col1", bsos)
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
         # those counts should be reflected back in query.
         resp = self.app.get(self.root + '/info/collection_counts')
@@ -119,7 +120,7 @@ class TestStorage(StorageFunctionalTestCase):
         self.assertEquals(len(resp.json), numcols + 1)
 
     def test_get_collection(self):
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
 
         # non-existent collections appear as empty
@@ -327,7 +328,7 @@ class TestStorage(StorageFunctionalTestCase):
         self.assertEquals(res, ['1', '2', '0'])
 
     def test_alternative_formats(self):
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
 
         # application/json
@@ -359,7 +360,7 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_set_collection_with_if_modified_since(self):
         # Create five items with different timestamps.
-        for i in xrange(5):
+        for i in range(5):
             bsos = [{"id": str(i), "payload": "xxx"}]
             self.app.post_json(self.root + "/storage/col2", bsos)
         # Get them all, along with their timestamps.
@@ -376,7 +377,7 @@ class TestStorage(StorageFunctionalTestCase):
         self.assertTrue("X-Last-Modified" in res.headers)
 
     def test_get_item(self):
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
         # grabbing object 1 from col2
         res = self.app.get(self.root + '/storage/col2/1')
@@ -605,9 +606,9 @@ class TestStorage(StorageFunctionalTestCase):
     def test_x_timestamp_header(self):
         # This can't be run against a live server.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
 
         now = round(time.time(), 2)
@@ -722,7 +723,7 @@ class TestStorage(StorageFunctionalTestCase):
     def test_overquota(self):
         # This can't be run against a live server.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         # Clear out any data that's already in the store.
         self.app.delete(self.root + "/storage")
@@ -772,7 +773,7 @@ class TestStorage(StorageFunctionalTestCase):
         # due to request size limits in nginx and
         # the fact that it reads config variables.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         # Test that batch uploads are correctly processed.
         # Uploading max_count-5 small objects should succeed.
@@ -860,7 +861,7 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_timestamp_numbers_are_decimals(self):
         # Create five items with different timestamps.
-        for i in xrange(5):
+        for i in range(5):
             bsos = [{"id": str(i), "payload": "xxx"}]
             self.app.post_json(self.root + "/storage/col2", bsos)
 
@@ -1044,17 +1045,17 @@ class TestStorage(StorageFunctionalTestCase):
         self.app.put_json(self.root + "/storage/col2/1", bso)
 
         # Getting with less than the limit works OK.
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS - 1))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS - 1))
         res = self.app.get(self.root + "/storage/col2?ids=" + ids)
         self.assertEquals(res.json, ["1"])
 
         # Getting with equal to the limit works OK.
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS))
         res = self.app.get(self.root + "/storage/col2?ids=" + ids)
         self.assertEquals(res.json, ["1"])
 
         # Getting with more than the limit fails.
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS + 1))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS + 1))
         self.app.get(self.root + "/storage/col2?ids=" + ids, status=400)
 
     def test_that_batch_deletes_are_limited_to_max_number_of_ids(self):
@@ -1062,17 +1063,17 @@ class TestStorage(StorageFunctionalTestCase):
 
         # Deleting with less than the limit works OK.
         self.app.put_json(self.root + "/storage/col2/1", bso)
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS - 1))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS - 1))
         self.app.delete(self.root + "/storage/col2?ids=" + ids)
 
         # Deleting with equal to the limit works OK.
         self.app.put_json(self.root + "/storage/col2/1", bso)
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS))
         self.app.delete(self.root + "/storage/col2?ids=" + ids)
 
         # Deleting with more than the limit fails.
         self.app.put_json(self.root + "/storage/col2/1", bso)
-        ids = ",".join(str(i) for i in xrange(BATCH_MAX_IDS + 1))
+        ids = ",".join(str(i) for i in range(BATCH_MAX_IDS + 1))
         self.app.delete(self.root + "/storage/col2?ids=" + ids, status=400)
 
     def test_that_expired_items_can_be_overwritten_via_PUT(self):
@@ -1088,7 +1089,7 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_if_modified_since_on_info_views(self):
         # Store something, so the views have a modified time > 0.
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(3)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(3)]
         self.app.post_json(self.root + "/storage/col1", bsos)
         INFO_VIEWS = ("/info/collections", "/info/quota",
                       "/info/collection_usage", "/info/collection_counts")
@@ -1131,7 +1132,7 @@ class TestStorage(StorageFunctionalTestCase):
         #     self.app.get(self.root + view, headers=headers, status=304)
 
     def test_that_x_last_modified_is_sent_for_all_get_requests(self):
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(5)]
         self.app.post_json(self.root + "/storage/col2", bsos)
         r = self.app.get(self.root + "/info/collections")
         self.assertTrue("X-Last-Modified" in r.headers)
@@ -1170,7 +1171,7 @@ class TestStorage(StorageFunctionalTestCase):
 
     def test_bulk_update_of_ttls_without_sending_data(self):
         # Create 5 BSOs with a ttl of 1 second.
-        bsos = [{"id": str(i), "payload": "x", "ttl": 1} for i in xrange(5)]
+        bsos = [{"id": str(i), "payload": "x", "ttl": 1} for i in range(5)]
         r = self.app.post_json(self.root + "/storage/col2", bsos)
         ts1 = float(r.headers["X-Last-Modified"])
         # Before they expire, bulk-update the ttl to something longer.
@@ -1178,7 +1179,7 @@ class TestStorage(StorageFunctionalTestCase):
         # And just to be really tricky, we're also going to update
         # one of the payloads at the same time.
         time.sleep(0.2)
-        bsos = [{"id": str(i), "ttl": 10} for i in xrange(3, 7)]
+        bsos = [{"id": str(i), "ttl": 10} for i in range(3, 7)]
         bsos[0]["payload"] = "xx"
         r = self.app.post_json(self.root + "/storage/col2", bsos)
         self.assertEquals(len(r.json["success"]), 4)
@@ -1282,10 +1283,10 @@ class TestStorage(StorageFunctionalTestCase):
         # This can't be run against a live server because we
         # have to forge an auth token to test things properly.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         # Write some items while we've got a good token.
-        bsos = [{"id": str(i), "payload": "xxx"} for i in xrange(3)]
+        bsos = [{"id": str(i), "payload": "xxx"} for i in range(3)]
         resp = self.app.post_json(self.root + "/storage/col1", bsos)
         ts = float(resp.headers["X-Last-Modified"])
 
@@ -1304,7 +1305,7 @@ class TestStorage(StorageFunctionalTestCase):
         self.auth_secret = tm.get_derived_secret(self.auth_token)
 
         # The expired token cannot be used for normal operations.
-        bsos = [{"id": str(i), "payload": "aaa"} for i in xrange(3)]
+        bsos = [{"id": str(i), "payload": "aaa"} for i in range(3)]
         self.app.post_json(self.root + "/storage/col1", bsos, status=401)
         self.app.get(self.root + "/storage/col1", status=401)
 
@@ -1764,11 +1765,11 @@ class TestStorageMemcached(TestStorage):
         try:
             super(TestStorageMemcached, self).setUp()
         except (ImportError, BackendError):
-            raise unittest2.SkipTest()
-        except webtest.AppError, e:
+            raise unittest.SkipTest()
+        except webtest.AppError as e:
             if "503" not in str(e):
                 raise
-            raise unittest2.SkipTest()
+            raise unittest.SkipTest()
 
     # Memcache backend is configured to store tabs in cache only.
     # Add some tests the see if they still behave correctly.
@@ -1799,7 +1800,7 @@ class TestStorageMemcached(TestStorage):
     def test_write_tabs_503(self):
         # This can't be run against a live server.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         class BadCache(object):
             """Cache client stub that raises BackendError on write."""
@@ -1841,7 +1842,7 @@ class TestStorageMemcached(TestStorage):
     def test_write_tabs_ConflictError(self):
         # This can't be run against a live server.
         if self.distant:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         class BadCache(object):
             """Cache client stub that raises ConflictError on write."""

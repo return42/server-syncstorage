@@ -56,7 +56,7 @@ def convert_storage_errors(viewfunc, request):
             "name": "offset",
             "description": "Invalid value for offset",
         }])
-    except InvalidBatch, e:
+    except InvalidBatch as e:
         raise HTTPBadRequest("Invalid batch: %s" % e)
 
 

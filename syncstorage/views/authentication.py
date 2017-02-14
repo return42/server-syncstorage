@@ -8,7 +8,7 @@ import logging
 import tokenlib
 import tokenlib.errors
 
-from zope.interface import implements
+from zope.interface import implementer
 from pyramid.interfaces import IAuthenticationPolicy
 from mozsvc.user import TokenServerAuthenticationPolicy
 
@@ -19,6 +19,7 @@ logger = logging.getLogger("syncstorage")  # pylint: disable=C0103
 DEFAULT_EXPIRED_TOKEN_TIMEOUT = 60 * 60 * 2  # 2 hours, in seconds
 
 
+@implementer(IAuthenticationPolicy)
 class SyncStorageAuthenticationPolicy(TokenServerAuthenticationPolicy):
     """Pyramid authentication policy with special handling of expired tokens.
 
@@ -28,8 +29,6 @@ class SyncStorageAuthenticationPolicy(TokenServerAuthenticationPolicy):
     just "<uid>", allowing this case to be specially detected and handled for
     some resources without interfering with the usual authentication rules.
     """
-
-    implements(IAuthenticationPolicy)
 
     def __init__(self, secrets=None, **kwds):
         self.expired_token_timeout = kwds.pop("expired_token_timeout", None)
@@ -90,7 +89,7 @@ class SyncStorageAuthenticationPolicy(TokenServerAuthenticationPolicy):
         try:
             userid = data["uid"]
             token_node_name = data["node"]
-        except KeyError, e:
+        except KeyError as e:
             msg = "missing value in token data: %s"
             raise ValueError(msg % (e,))
         if token_node_name != node_name:

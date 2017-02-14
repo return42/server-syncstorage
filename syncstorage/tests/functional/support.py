@@ -9,10 +9,9 @@ import sys
 import optparse
 import random
 import json
-import urlparse
 import contextlib
 
-import unittest2
+import unittest
 import requests
 
 import hawkauthlib
@@ -25,6 +24,8 @@ from mozsvc.tests.support import FunctionalTestCase
 
 from syncstorage.tests.support import StorageTestCase
 
+from six.moves import range
+from six.moves import urllib
 
 class StorageFunctionalTestCase(FunctionalTestCase, StorageTestCase):
     """Abstract base class for functional testing of a storage API."""
@@ -57,7 +58,7 @@ class StorageFunctionalTestCase(FunctionalTestCase, StorageTestCase):
     def _switch_user(self):
         # It's hard to reliably switch users when testing a live server.
         if self.distant:
-            raise unittest2.SkipTest("Skipped when testing a live server")
+            raise unittest.SkipTest("Skipped when testing a live server")
         # Temporarily authenticate as a different user.
         orig_user_id = self.user_id
         orig_auth_token = self.auth_token
@@ -65,7 +66,7 @@ class StorageFunctionalTestCase(FunctionalTestCase, StorageTestCase):
         try:
             # We loop because the userids are randomly generated,
             # so there's a small change we'll get the same one again.
-            for retry_count in xrange(10):
+            for retry_count in range(10):
                 self._authenticate()
                 if self.user_id != orig_user_id:
                     break
@@ -121,8 +122,8 @@ def authenticate_to_token_server(url, email=None, audience=None):
     if email is None:
         email = "user%s@%s" % (random.randint(1, 100000), MOCKMYID_DOMAIN)
     if audience is None:
-        audience = urlparse.urlparse(url)._replace(path="")
-        audience = urlparse.urlunparse(audience)
+        audience = urllib.parse.urlparse(url)._replace(path="")
+        audience = urllib.parse.urlunparse(audience)
     assertion = browserid.tests.support.make_assertion(
         email=email,
         audience=audience,
@@ -139,7 +140,7 @@ def authenticate_to_token_server(url, email=None, audience=None):
     return creds
 
 
-def run_live_functional_tests(TestCaseClass, argv=None):
+def run_live_functional_tests(TestCaseClass, argv=None): # pylint: disable=C0103
     """Execute the given suite of testcases against a live server."""
     if argv is None:
         argv = sys.argv
@@ -163,7 +164,7 @@ def run_live_functional_tests(TestCaseClass, argv=None):
 
     try:
         opts, args = parser.parse_args(argv)
-    except SystemExit, e:
+    except SystemExit as e:
         return e.args[0]
     if len(args) != 2:
         parser.print_usage()
@@ -183,7 +184,7 @@ def run_live_functional_tests(TestCaseClass, argv=None):
         if opts.audience is not None:
             msg = "cant specify audience unless using live tokenserver"
             raise ValueError(msg)
-        host_url = urlparse.urlparse(url)
+        host_url = urllib.parse.urlparse(url)
         secret = None
         if host_url.fragment:
             secret = host_url.fragment
@@ -204,7 +205,7 @@ def run_live_functional_tests(TestCaseClass, argv=None):
 
         # Point the tests at the given endpoint URI, after stripping off
         # the trailing /2.0/UID component.
-        host_url = urlparse.urlparse(creds["api_endpoint"])
+        host_url = urllib.parse.urlparse(creds["api_endpoint"])
         host_path = host_url.path.rstrip("/")
         host_path = "/".join(host_path.split("/")[:-2])
         host_url = host_url._replace(path=host_path)
@@ -217,10 +218,10 @@ def run_live_functional_tests(TestCaseClass, argv=None):
                 self.auth_token = creds["id"].encode("ascii")
                 self.auth_secret = creds["key"].encode("ascii")
 
-    # Now use the unittest2 runner to execute them.
-    suite = unittest2.TestSuite()
-    suite.addTest(unittest2.makeSuite(LiveTestCases))
-    runner = unittest2.TextTestRunner(
+    # Now use the unittest runner to execute them.
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(LiveTestCases))
+    runner = unittest.TextTestRunner(
         stream=sys.stderr,
         failfast=opts.failfast,
     )

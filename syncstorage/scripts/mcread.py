@@ -21,6 +21,7 @@ import syncstorage.scripts
 from syncstorage.storage import get_all_storages
 from syncstorage.storage.memcached import MemcachedStorage
 
+import six
 
 logger = logging.getLogger("syncstorage.scripts.mcread")  # pylint: disable=C0103
 
@@ -70,7 +71,7 @@ def maybe_open(name_or_fileobj, mode):
     This is very useful if the caller can specify a file by giving either
     its path or an existing filelike object.
     """
-    if not isinstance(name_or_fileobj, basestring):
+    if not isinstance(name_or_fileobj, six.string_types):
         yield name_or_fileobj
     else:
         with open(name_or_fileobj, mode) as fileobj:

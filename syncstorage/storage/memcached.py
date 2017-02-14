@@ -770,7 +770,7 @@ class _CachedManagerBase(object):
         # because we don't have a way to enumerate all user ids.
         expired_ids = set()
         expiry_time = int(time.time()) - TTL_EXPIRY_GRACE_PERIOD
-        for id, bso in data["items"].iteritems():
+        for id, bso in data["items"].items():
             ttl = bso.get("ttl")
             if ttl is not None and ttl < expiry_time:
                 expired_ids.add(id)

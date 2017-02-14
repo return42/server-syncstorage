@@ -10,12 +10,6 @@ from pyramid.httpexceptions import HTTPException
 
 from syncstorage.util import get_timestamp
 
-try:
-    from mozsvc.storage.mcclient import MemcachedClient
-except ImportError:
-    MemcachedClient = None  # NOQA
-
-
 WEAVE_UNKNOWN_ERROR = 0
 WEAVE_ILLEGAL_METH = 1              # Illegal method/protocol
 WEAVE_MALFORMED_JSON = 6            # Json parse failure
@@ -99,7 +93,7 @@ def convert_cornice_errors_to_respcodes(handler, registry):   # pylint: disable=
     def convert_cornice_errors_to_respcodes_tween(request):
         try:
             response = handler(request)
-        except HTTPException, response:
+        except HTTPException as response:
             if response.content_type == "application/json":
                 convert_cornice_response(request, response)
             raise
@@ -123,7 +117,7 @@ def convert_non_json_responses(handler, registry):  # pylint: disable=W0613
     def convert_non_json_responses_tween(request):
         try:
             response = handler(request)
-        except HTTPException, response:
+        except HTTPException as response:
             if response.content_type != "application/json":
                 response.body = str(WEAVE_UNKNOWN_ERROR)
                 response.content_length = len(response.body)

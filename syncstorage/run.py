@@ -9,10 +9,12 @@
 Runs the Application. This script can be called by any wsgi runner that looks
 for an 'application' variable
 """
+
 import os
 from logging.config import fileConfig
-from ConfigParser import NoSectionError
 from paste.deploy import loadapp
+
+from six.moves import configparser
 
 # setting up the egg cache to a place where apache can write
 os.environ['PYTHON_EGG_CACHE'] = '/tmp/python-eggs'
@@ -32,7 +34,7 @@ ini_file = os.path.abspath(ini_file)
 # setting up logging
 try:
     fileConfig(ini_file)
-except NoSectionError:
+except configparser.NoSectionError:
     pass
 
 # running the app using Paste

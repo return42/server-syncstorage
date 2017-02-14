@@ -4,7 +4,7 @@
 #
 # pylint: disable=W1505, C0103
 
-import unittest2
+import unittest
 import time
 
 try:
@@ -35,7 +35,7 @@ class TestMemcachedSQLStorage(StorageTestCase, StorageTestsMixin):
     def setUp(self):
         super(TestMemcachedSQLStorage, self).setUp()
         if not MEMCACHED:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
         settings = self.config.registry.settings
         self.storage = load_storage_from_settings("storage", settings)
@@ -45,7 +45,7 @@ class TestMemcachedSQLStorage(StorageTestCase, StorageTestsMixin):
             self.storage.cache.set('test', 1)
             assert self.storage.cache.get('test') == 1
         except BackendError:
-            raise unittest2.SkipTest
+            raise unittest.SkipTest
 
     def test_basic(self):
         # just make sure calls goes through
@@ -297,11 +297,11 @@ class TestMemcachedSQLStorage(StorageTestCase, StorageTestsMixin):
 
 
 def test_suite():
-    suite = unittest2.TestSuite()
+    suite = unittest.TestSuite()
     if MEMCACHED:
-        suite.addTest(unittest2.makeSuite(TestMemcachedSQLStorage))
+        suite.addTest(unittest.makeSuite(TestMemcachedSQLStorage))
     return suite
 
 
 if __name__ == "__main__":
-    unittest2.main(defaultTest="test_suite")
+    unittest.main(defaultTest="test_suite")
