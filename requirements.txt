@@ -1,41 +1,83 @@
-Paste==2.0.2
-PasteDeploy==1.5.2
-PyBrowserID==0.9.2
-PyMySQL==0.6.7
-SQLAlchemy==1.0.8
-WSGIProxy==0.2.2
-WebOb==1.4.1
-WebTest==2.0.18
-beautifulsoup4==4.4.1
-configparser==3.5.0b2
-cornice==0.17
-flake8==2.4.1
-gevent==1.0.2
-greenlet==0.4.9
-gunicorn==19.3.0
-hawkauthlib==0.1.1
-konfig==0.9
-linecache2==1.0.0
-mccabe==0.3.1
-mozsvc==0.8
-nose==1.3.7
-pep8==1.6.2
-pyflakes==1.0.0
-pymysql-sa==1.0
-pyramid-hawkauth==0.1.0
-pyramid==1.5.7
-repoze.lru==0.6
-requests==2.8.0
-simplejson==3.8.0
-six==1.10.0
-testfixtures==4.3.3
-tokenlib==0.3.1
-traceback2==1.4.0
-translationstring==1.3
-umemcache==1.6.3
-unittest2==1.1.0
-venusian==1.0
-waitress==0.8.10
-wheel==0.24.0
-zope.deprecation==4.1.2
-zope.interface==4.1.3
+# -------------------------------------
+# required for the period of transition
+# -------------------------------------
+
+-e file:../konfig#egg=konfig
+# konfig >= 2.0
+# git+https://github.com/return42/konfig@six#egg=konfig
+
+-e file:../tokenlib#egg=tokenlib
+# tokenlib >= 2.0
+# git+https://github.com/return42/tokenlib@six#egg=tokenlib
+
+-e file:../hawkauthlib#egg=hawkauthlib
+# hawkauthlib >= 2.0
+# git+https://github.com/return42/hawkauthlib@six#egg=hawkauthlib
+
+-e file:../pyramid_hawkauth#egg=pyramid_hawkauth
+# pyramid_hawkauth >= 2.0
+# git+https://github.com/return42/pyramid_hawkauth@six#egg=pyramid_hawkauth
+
+# M2Crypto > 0.25.1
+#
+# FIXME: M2Crypto is only available for Py2. For the transition time, there is
+# the M2Crypto hack at:
+#
+#   https://github.com/return42/m2crypto/commits/six
+#
+# git+https://github.com/return42/m2crypto@six#egg=M2Crypto
+-e file:../m2crypto#egg=M2Crypto --global-option="build_ext"
+
+
+# --------
+# requires
+# --------
+
+-e file:../konfig#egg=konfig
+# konfig >= 2.0
+# git+https://github.com/return42/konfig@six#egg=konfig
+
+-e file:../hawkauthlib#egg=hawkauthlib
+# hawkauthlib >= 2.0
+# git+https://github.com/return42/hawkauthlib@six#egg=hawkauthlib
+
+-e file:../tokenlib#egg=tokenlib
+# tokenlib >= 2.0
+# git+https://github.com/return42/tokenlib@six#egg=tokenlib
+
+-e file:../mozservices#egg=mozsvc[test]
+# mozservices >= 2.0
+# git+https://github.com/return42/mozservices@six#egg=mozsvc
+
+cornice
+pyramid
+requests
+simplejson
+six
+sqlalchemy
+zope.interface
+
+# --------
+# test
+# --------
+
+Paste
+PasteDeploy
+testfixtures
+webtest
+
+-e file:../PyBrowserID#egg=PyBrowserID
+# PyBrowserID >= 2.0
+# git+https://github.com/return42/PyBrowserID@six#egg=PyBrowserID
+
+# --------
+# develop
+# --------
+
+pytest
+pytest-cov
+pip
+pylint
+tox
+twine
+wheel
